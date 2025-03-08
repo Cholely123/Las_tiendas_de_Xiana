@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Tiendas</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow-x: hidden;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            max-width: 500px; /* Max ancho para móviles */
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .option {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            max-width: 120px; /* Tamaño ajustado para móvil */
+        }
+        .option:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .player {
+            margin: 10px 0;
+            font-size: 1.2em;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .player div {
+            display: flex;
+            flex-direction: column; /* Alinea las tiendas verticalmente */
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        .input-container input {
+            padding: 10px;
+            font-size: 18px;
+            margin-right: 10px;
+            width: 80%;
+            max-width: 100px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ffffff;
+            color: #8e44ad;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #9b59b6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Las tiendas de Xiana</h1>
+    <h2>Asignación de Tiendas</h2>
+
+    <div class="input-container">
+        <label for="num-jugadores">Selecciona el número de jugadores (2-5): </label>
+        <input type="number" id="num-jugadores" min="2" max="5" value="2">
+        <button onclick="generateStores()">Generar Tiendas</button>
+    </div>
+
+    <div id="players-container" style="display: flex; flex-direction: column; width: 100%; overflow-y: auto;"></div>
+</div>
+
+<script>
+    const tiendas = ["H&M", "Pull&Bear", "Chanel", "Gucci", "Stradivarius", "Zara"];
+    let tiendasAsignadas = {
+        "H&M": 0,
+        "Pull&Bear": 0,
+        "Chanel": 0,
+        "Gucci": 0,
+        "Stradivarius": 0,
+        "Zara": 0
+    };
+
+    // Función para generar las tiendas
+    function generateStores() {
+        const numJugadores = parseInt(document.getElementById('num-jugadores').value); // Número de jugadores elegido
+        const playersContainer = document.getElementById('players-container');
+        playersContainer.innerHTML = ''; // Limpiar cualquier contenido previo
+
+        // Re-iniciar el contador de tiendas asignadas
+        tiendasAsignadas = {
+            "H&M": 0,
+            "Pull&Bear": 0,
+            "Chanel": 0,
+            "Gucci": 0,
+            "Stradivarius": 0,
+            "Zara": 0
+        };
+
+        // Generar las tiendas para cada jugador
+        for (let i = 1; i <= numJugadores; i++) {
+            const playerDiv = document.createElement('div');
+            playerDiv.classList.add('player');
+            playerDiv.innerHTML = `<strong>Jugador ${i}:</strong>`;
+
+            // Tiendas aleatorias para el jugador
+            const tiendasJugador = getRandomStores();
+
+            // Mostrar las tiendas del jugador de manera vertical
+            const playerStoresDiv = document.createElement('div');
+            tiendasJugador.forEach(tienda => {
+                const tiendaDiv = document.createElement('div');
+                tiendaDiv.classList.add('option');
+                tiendaDiv.textContent = tienda;
+                playerStoresDiv.appendChild(tiendaDiv);
+            });
+
+            playerDiv.appendChild(playerStoresDiv);
+            playersContainer.appendChild(playerDiv);
+        }
+    }
+
+    // Función para obtener 4 tiendas aleatorias, asegurando que no se repita ninguna
+    function getRandomStores() {
+        const availableStores = tiendas.filter(tienda => tiendasAsignadas[tienda] < 4);
+        const tiendasJugador = [];
+
+        // Escoger 4 tiendas aleatorias para el jugador
+        while (tiendasJugador.length < 4) {
+            const randomIndex = Math.floor(Math.random() * availableStores.length);
+            const tienda = availableStores[randomIndex];
+
+            if (tiendasAsignadas[tienda] < 4 && !tiendasJugador.includes(tienda)) {
+                tiendasJugador.push(tienda);
+                tiendasAsignadas[tienda]++;
+            }
+        }
+
+        // Comprobar si hemos asignado las 4 tiendas necesarias
+        if (tiendasJugador.length === 4) {
+            return tiendasJugador;
+        } else {
+            return getRandomStores(); // Si no se pudo asignar correctamente, volver a intentar
+        }
+    }
+</script>
+
+</body>
+</html>
